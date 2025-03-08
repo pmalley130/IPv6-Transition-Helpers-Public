@@ -28,7 +28,7 @@ function Get-Policy { #returns a PSCustomObject of a Firewall policy
             $srcTable = @()
             foreach ($group in $this.srcaddr){
                 if ($group.name -ne 'all') {
-                    $srcTable += Get-Addresses -address $group.name -vdom $this.vdom
+                    $srcTable += Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom
                 } else {
                     $srcTable += "all"
                 }
@@ -40,7 +40,7 @@ function Get-Policy { #returns a PSCustomObject of a Firewall policy
             $dstTable = @()
             foreach ($group in $this.dstaddr){
                 if ($group.name -ne 'all') {
-                    $dstTable += Get-Addresses -address $group.name -vdom $this.vdom
+                    $dstTable += Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom
                 } else {
                     $dstTable += "all"
                 }
