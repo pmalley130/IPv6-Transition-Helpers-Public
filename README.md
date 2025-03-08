@@ -25,6 +25,12 @@ Get-Addresses takes the name of an address object (or address group) and returns
 ### Get-AddressesfromGroup.ps1
 Get-AddressesfromGroup is a recursive function that takes the name of an address group and will return all of the addresses used in the group in an array. It also adds the name of each group an address is a part of for later reconstruction (most likely for use in an IPv6 object to keep naming consistent). Requires -fwfqdn (the FQDN of the firewall), -addressGroup (name of the address group object), and -vdom (the vdom the object is in)
 
+### Add-AddressObject.ps1
+Add-AddressObject adds an address object to the firewall. Requires --fwfqdn (the FQDN of the firewall), -objectName (name of the new address object), -address (ip address of the new object, ipv4 or ipv6), and -vdom (the vdom the object is in)
+
+### Add-AddressGroup.ps1
+Add-AddressGroup creates an address group out of the names of address objects sent to it. Requires --fwfqdn (the FQDN of the firewall), -groupName (name of the new address object), -addresses (names of existing address objects, sent as an array: "object1","object2"), and -vdom (the vdom the object is in)
+
 ### Get-Policy.ps1
 Get-Policy returns a PSCustomObject of a Fortigate firewall policy with some fields and helper functions added. Requires -fwfqdn (the FQDN of the firewall), -policyNumber (the policy ID of the policy), and -vdom (the vdom the policy is in). The additions to the object are:
 
