@@ -3,7 +3,7 @@
 #            Original 5/11/23             #
 ###########################################
 
-function Get-Addresses { #Function to return addresses from a fw policy
+function Get-Addresses { #Function to return addresses from a fw policy - v4 only for now
     param(
         [String]$fwfqdn, #fqdn of firewall
         [string]$address,
