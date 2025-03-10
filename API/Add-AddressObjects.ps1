@@ -16,8 +16,8 @@ function Add-AddressObjects { #function to add address objects to a firewall, us
     $v6Objects=@()
 
     foreach ($addressObject in $addressObjects){ #cycle through all objects and add them to respective arrays based on IP version
-        if ($addressObject.containsKey('ip6')) { $v4Objects += $addressObject }
-        elseif ($addressObject.containsKey('subnet')) {$v6Objects +=$addressObjects}
+        if ($addressObject.containsKey('ip6')) { $v6Objects += $addressObject }
+        elseif ($addressObject.containsKey('subnet')) {$v4Objects +=$addressObjects}
         else { Write-Host $addressObject.name + "is invalid" }
     }
 
