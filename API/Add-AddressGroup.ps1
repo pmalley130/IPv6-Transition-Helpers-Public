@@ -12,8 +12,11 @@ function Add-AddressGroup { #function to add address group to a firewall
             [string]$vdom
         )
 
+    Write-Debug "in add-addrgrp adding $groupName with "
+    Write-Debug $addresses
     
-    if ($addresses[0].Contains(':')){ #determine if it's ipv4 or 6, set URL and API payload
+
+    if (($addresses -match "v6") -or ($addresses -match ":")){ #determine if it's ipv4 or 6, set URL and API payload (this assumes hosts and groups are named correctly... maybe should validate with api but that's a lot)
             $apiURL = "https://" + $fwfqdn + "/api/v2/cmdb/firewall/addrgrp6/?vdom=" + $vdom #set url for ipv6
     } 
     else {
@@ -25,9 +28,11 @@ function Add-AddressGroup { #function to add address group to a firewall
         $members += @{name=$address}
     }
 
-    $data = [ordered]@{#create the data to be sent via API
-        name="API test"
+    $data = [ordered]@{#create the data to be sent via API (comment and color so we know the script did it)
+        name=$groupName
         member=$members
+        comment="added by API"
+        color="20"
     }
 
     $dataJson = $data | ConvertTo-Json #REST API only takes json so format it
@@ -35,10 +40,10 @@ function Add-AddressGroup { #function to add address group to a firewall
     try { #make the API call
         $answer = (Invoke-RestMethod -method Post -uri $apiURL -Body $dataJson -Headers $headers)
     } catch [System.Net.WebException] {
-        $hostMSG = $apiURL + " is returning error" + $answer.status
+        Write-Debug "error in add-addressgroup at $apiurl"
     }
         
-    return $answer.mkey + " " + $answer.status #let console know whether it succeeded
+    return
 }
 
 

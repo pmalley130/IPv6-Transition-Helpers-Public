@@ -29,17 +29,16 @@ function Add-AddressObject { #function to add address object to a firewall
             }
     }
 
-    $body.Add("comment","added by API")
-
+    $body.Add("comment","added by API") #add comment and color so we know the script did it
+    $body.Add("color","20")
     $bodyJson = $body | ConvertTo-Json #convert to format that the API can handle
 
     try { #make the api call
         $answer = (Invoke-RestMethod -method Post -uri $apiURL -Body $bodyJson -Headers $headers)
     } catch [System.Net.WebException] {
-        $hostMSG = $apiURL + " is returning error" + $answer.status
+        Write-Debug "error in add-addressobject at $apiURL"
+        return
     }
-        
-    return $answer.mkey + " " + $answer.status #let console know whether it succeeded
 }
 
 

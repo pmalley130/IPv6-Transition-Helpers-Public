@@ -4,11 +4,15 @@
 #           Tested on 7.0.x               #
 ###########################################
 
-function Get-Policy { #returns a PSCustomObject of a Firewall policy
+#returns a PSCustomObject of a Firewall policy
+#adds custom properties for vdom, and the firewall's name and fqdn for use in other functions
+#adds functions to enumerate all source and destination objects
+
+function Get-Policy { 
     param(
         [string]$fwfqdn, #fqdn of firewall
-        [string]$policyNumber, #policy ID
-        [string]$vdom #vdom name
+        [string]$policyNumber,
+        [string]$vdom
     )
 
     $apiURL = "https://" + $fwfqdn + "/api/v2/cmdb/firewall/policy/" + $policyNumber + "/?vdom=" + $vdom #create the API request URL
@@ -19,16 +23,19 @@ function Get-Policy { #returns a PSCustomObject of a Firewall policy
         #save vdom to new property
         $response | Add-Member -NotePropertyName vdom -NotePropertyValue $vdom
 
-        #new API call to find name of firewall and save to new property
+        #save fwfqdn to policy for future lookups
+        $response | Add-member -NotePropertyName fwfqdn $fwfqdn
+
+        #new API call to find name of firewall
         $apiURL = "https://" + $fwfqdn + "/api/v2/monitor/system/status"
         $fwname = (Invoke-RestMethod -method Get -Uri $apiURL -Headers $headers).results.hostname
         $response | Add-Member -NotePropertyName fwname -NotePropertyValue $fwname
 
-        $enumerateSrc = {
+        $enumerateSrc = { #function to grab all source objects
             $srcTable = @()
             foreach ($group in $this.srcaddr){
                 if ($group.name -ne 'all') {
-                    $srcTable += Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom
+                    $srcTable += (Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom)
                 } else {
                     $srcTable += "all"
                 }
@@ -36,11 +43,11 @@ function Get-Policy { #returns a PSCustomObject of a Firewall policy
             return $srcTable
         }
 
-        $enumerateDst = {
+        $enumerateDst = { #function to grab all destination objects
             $dstTable = @()
             foreach ($group in $this.dstaddr){
                 if ($group.name -ne 'all') {
-                    $dstTable += Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom
+                    $dstTable += (Get-Addresses -fwfqdn $this.fwfqdn -address $group.name -vdom $this.vdom)
                 } else {
                     $dstTable += "all"
                 }
@@ -52,8 +59,8 @@ function Get-Policy { #returns a PSCustomObject of a Firewall policy
         $response | Add-Member -MemberType ScriptMethod -Name GetDestinationAddresses -Value $enumerateDst
         
     } catch [System.Net.WebException] {
-        $hostMSG = $apiURL + " is returning an error"
-        Write-Host $hostMSG
+        Write-Debug "$apiURL is returning an error"
+        return
     }
 
     return $response    
