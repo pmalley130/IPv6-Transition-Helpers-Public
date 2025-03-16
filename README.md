@@ -26,6 +26,12 @@ Get-Policy returns a PSCustomObject of a Fortigate firewall policy with some fie
 - enumerateSrc outputs all of the address objects in the source field of the policy
 - enumerateDst outputs all of the address objects in the destination field of the policy
 
+### Dualstack-Policy.ps1
+Dualstack-policy accepts a firewall policy, looks at the IPv4 sources and destinations, converts all groups and objects to IPv6, and adds them to the policy. Accepts pipeline input. Requires -policy (a firewall policy object returned by Get-Policy)
+
+### Update-PolicyAddresses.ps1
+Update-PolicyAddresses updates the IPv4 and IPv6 addresses in a policy object. Note, the firewall will return an error if you add a type of address to src and not destination, i.e., an IPv6 address in src and only IPv4 addresses in dst. Requires -fwfqdn (the FQDN of the firewall), -policyid (the policy # of the firewall policy you're updating), -vdom (the vdom the policy is in), [-srcaddr, -dstaddr] (hashtable arrays of values representing the IPv4 source and destination addresses to add to the firewall, only needs "name" key) AND/OR [-srcaddr6, -dstaddr6] (hashtable arrays of values representing the IPv6 source and destination addresses to add to the firewall, only needs "name" key)
+
 ### Get-AddressObject.ps1
 Get-AddressObject take the name of an IPv4 or IPv6 address object (assumes that the name contains the address itself) and returns the address object from the firewall. Requires -fwfqdn (the FQDN of the firewall), -objectName (name of the address object), and -vdom (the vdom the object is in). Returns null if object cannot be found.
 
@@ -47,8 +53,6 @@ Add-AddressGroup creates an address group out of the names of address objects se
 ### Add-AddressObjects.ps1 
 Add-AddressObjects creates address objects on the firewall out of an array of addressObjects{}. Each hashtable requires the name key for the name of the object, and either "ip6" key for an IPv6 address or "subnet" key for an IPv4 address. Requires -fwfqdn (the FQDN of the firewall), -addressObjects (the name/value pairs that make the firewall objects), and -vdom (the vdom the object is in)
 
-### Update-PolicyAddresses.ps1
-Update-PolicyAddresses updates the IPv4 and IPv6 addresses in a policy object. Note, the firewall will return an error if you add a type of address to src and not destination, i.e., an IPv6 address in src and only IPv4 addresses in dst. Requires -fwfqdn (the FQDN of the firewall), -policyid (the policy # of the firewall policy you're updating), -vdom (the vdom the policy is in), [-srcaddr, -dstaddr] (hashtable arrays of values representing the IPv4 source and destination addresses to add to the firewall, only needs "name" key) AND/OR [-srcaddr6, -dstaddr6] (hashtable arrays of values representing the IPv6 source and destination addresses to add to the firewall, only needs "name" key)
 
-### Dualstack-Policy.ps1
-Dualstack-policy accepts a firewall policy, looks at the IPv4 sources and destinations, converts all groups and objects to IPv6, and adds them to the policy. Accepts pipeline input. Requires -policy (a firewall policy object returned by Get-Policy)
+
+
