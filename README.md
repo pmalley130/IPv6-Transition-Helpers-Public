@@ -17,7 +17,7 @@ Get-IPsInRange takes a CIDR and outputs every IP in the CIDR, but also allows yo
 Output-PolicyAddresses takes a [PSCustomObject] firewall policy (it's literally just a json file of the REST API output when you GET a firewall policy from a Fortigate with a couple of helper functions added - see API folder) and spits out a CSV of all source and destination addresses involved in the policy, mostly used for diff and debug
 
 ## API Folder
-These ones require access to the management interface of a Fortigate and a working method of API use. I use a header with the authorization token in these, saved to a global variable, $headers
+These ones require access to the management interface of a Fortigate and a working method of REST API authentication. The script assumes an authorization token saved to global variable $headers.
 
 ### Get-Policy.ps1
 Get-Policy returns a PSCustomObject of a Fortigate firewall policy with some fields and helper functions added. Requires -fwfqdn (the FQDN of the firewall), -policyNumber (the policy ID of the policy), and -vdom (the vdom the policy is in). The additions to the object are: 
