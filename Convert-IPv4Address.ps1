@@ -64,7 +64,44 @@ function Convert-IPv4Address {
         #mash them together
         $IPv6Address = "" #redacted for security
 
-        return $Ipv6Address
+        if ($useDNS) { #if -useDNS is enabled, do a DNS lookup as well
+            $DNSfinal = DNS-Translate $address
+            if (($DNSFinal) -and ($IPv6Address -ne $DNSfinal)) { #if DNS lookup isn't null and matches our calculated string
+                Write-Debug "DNS and translation mismatched for $address, returning DNS result anyway"
+                return $DNSfinal
+            } elseif ($DNSfinal) { #if it returned an address and didn't hit the previous block we're good
+                Write-Debug "DNS and translation match for $address"
+                return $DNSfinal
+            } else { #if the lookup failed we come here and return the calculated address
+                Write-Debug "DNS lookup failed for $address"
+                return $IPv6Address
+            }
+        } else { #if we don't want to look at DNS come here
+            return $IPv6Address
+        }
+    }
+}
+
+function DNS-Translate { #goes through two DNS lookups to take a v4 and find the corresponding v6.. honestly should integrate with DDI solution's API instead
+    param ([string]$address)
+    
+    try {
+        $results = Resolve-DnsName -name $address #resolve v4 address
+    } catch {
+        return #return null if DNS fails
+    }
+
+    if ($results.NameHost) { #if it resolves
+        try{
+            $nameResults = Resolve-DnsName -name $results.NameHost #lookup hostname
+        } catch {
+            return #if the next one (hostname resolution) fails
+        }
+        foreach ($record in $nameResults) { #step through records
+            if (($record.Type -eq 'AAAA') -and ((!$record.IPAddress.contains('fe80')) -and (!$record.IPAddress.contains('6464')))) { #check for AAAA record and make sure it's not link local or nat64
+                return $record.IPAddress
+            }
+        }
     }
 }
 
