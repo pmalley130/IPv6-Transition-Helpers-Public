@@ -1,10 +1,10 @@
 # IPv6-Transition-Helpers
 Helper Powershell methods to translate IPv4 addresses and firewall policies. Home folder contains tools to be used on any computer, API folder requires access to a Fortinet firewall.
 
-These won't be helpful to the general public, they're to be used with the addressing scheme at my own organization. We use the original IPv4 address of a device along with which physical site it resides at, which vlan it's on, and a few other identifiers to determine the address. It assumes that there's a "subnets.json" file in the directory it's being run from - this file was born from a spreadsheet that contains all of the CIDRs from our DDI solution along with their vlan and site number. It works as a lookup key for the script.
+These won't be helpful to the general public, they're to be used with the addressing scheme at my own organization. We use the original IPv4 address of a device along with which physical site it resides at, which vlan it's on, and a few other identifiers to determine the address. The script assumes that there's a "subnets.json" file in the directory it's being run from - this file was born from a spreadsheet that contains all of the CIDRs from our DDI solution along with their vlan and site number. It works as a lookup key for the script.
 
 ### Convert-IPv4Address.ps1
-Convert-IPv4Address takes an IPv4 address (string) and outputs its IPv6 equivalent. It has arguments -address (mandatory), -routable (in, out, infra), and -type (router, security device, L3 switch, DHCPv6, Network Device, Server Device, Other-Static). If routable and type are note supplied it assumes "out" and "server device". It accepts pipeline input.
+Convert-IPv4Address takes an IPv4 address (string) and outputs its IPv6 equivalent. It has arguments -address (mandatory), -routable (in, out, infra), and -type (router, security device, L3 switch, DHCPv6, Network Device, Server Device, Other-Static). If routable and type are note supplied it assumes "out" and "server device". It accepts pipeline input. The -useDNS flag will attempt to look up the hostname and then the IPv6 record of the address. If the lookup is successful it will return the DNS version, with debug or verbose on it will warn if there is a mismatch between the translation and lookup (but still return the result of the lookup).
 
 This file also has helper commands Get-IPv4Location (returns which site a device is in), Get-IPv4CIDR (returns which subnet it's in), Get-IPv4VLAN, and Get-IPv4SiteHex (returns the hex identifier we use for physical location).
 
